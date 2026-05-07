@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Max Factor · Ruleta de Premios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #1A1A1A;
+    --gold: #CFB598;
+    --gold-light: #E5D4BE;
+    --gold-deep: #A89376;
+    --ivory: #FAF6ED;
+    --black: #1A1A1A;
+    /* Paleta ruleta - solo dos tonos alternados */
+    --pal-grey: #726454;
+    --pal-cream: #CFB598;
+    --pal-gold: #E5B547;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow-x: hidden; }
+  body {
+    font-family: 'Oswald', 'Barlow Condensed', sans-serif;
+    background:
+      radial-gradient(ellipse at top, #2a2a2a 0%, transparent 60%),
+      radial-gradient(ellipse at bottom, #0d0d0d 0%, transparent 50%),
+      linear-gradient(180deg, var(--bg-base) 0%, #0f0f0f 100%);
+    background-attachment: fixed;
+    color: var(--ivory);
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 32px; position: relative;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.81 0 0 0 0 0.71 0 0 0 0 0.6 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.3; pointer-events: none; mix-blend-mode: overlay; z-index: 1;
+  }
+  .container {
+    position: relative; z-index: 2; width: 100%; max-width: 460px;
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+  }
+  /* ========= Brand ========= */
+  .brand {
+    text-align: center; padding: 8px 0; width: 100%;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .brand-logo {
+    width: 80%; max-width: 320px; height: auto; display: block;
+    filter: drop-shadow(0 0 24px rgba(207, 181, 152, 0.25));
+  }
+  .brand-tagline {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 300;
+    font-size: 13px; color: var(--gold);
+    letter-spacing: 4px; margin-top: 10px;
+    text-transform: uppercase;
+  }
+  /* ========= Screens ========= */
+  .screen { width: 100%; display: none; flex-direction: column; align-items: center; gap: 24px; }
+  .screen.active { display: flex; animation: fadeIn 0.6s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  /* ========= Landing ========= */
+  .landing-hero { text-align: center; padding: 8px 0; }
+  .landing-hero h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600; font-size: 42px;
+    letter-spacing: 4px; color: var(--ivory);
+    text-transform: uppercase; line-height: 1.05;
+  }
+  .landing-hero h1 em {
+    font-style: italic; font-weight: 500; color: var(--gold);
+    display: block; margin-top: 4px; letter-spacing: 6px;
+  }
+  .landing-hero p {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 300; font-style: italic;
+    font-size: 17px; color: var(--ivory); opacity: 0.8;
+    letter-spacing: 1.5px; margin-top: 18px; line-height: 1.5;
+  }
+  /* ========= Form ========= */
+  .form-card {
+    width: 100%; background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(207, 181, 152, 0.3);
+    padding: 28px 24px; position: relative;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .form-card::before {
+    content: ''; position: absolute; inset: 4px;
+    border: 1px solid rgba(207, 181, 152, 0.15); pointer-events: none;
+  }
+  .form-label {
+    display: block; font-family: 'Oswald', sans-serif;
+    font-size: 12px; font-weight: 600; letter-spacing: 3px;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .form-input {
+    width: 100%; background: transparent; border: none;
+    border-bottom: 1px solid var(--gold); padding: 10px 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px; font-weight: 400;
+    color: var(--ivory); letter-spacing: 0.5px; outline: none;
+    transition: border-color 0.3s;
+  }
+  .form-input::placeholder {
+    color: rgba(250, 246, 237, 0.35); font-style: italic; font-weight: 300;
+  }
+  .form-input:focus { border-color: var(--gold-light); }
+  .form-input.error { border-color: #d4869a; animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .form-error {
+    display: none; font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 400;
+    font-size: 14px; color: #d4869a; margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+  .form-error.active { display: block; }
+  .consent-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-top: 20px; cursor: pointer; user-select: none;
+  }
+  .consent-checkbox {
+    appearance: none; -webkit-appearance: none;
+    width: 18px; height: 18px; min-width: 18px;
+    border: 1px solid var(--gold); background: transparent;
+    position: relative; cursor: pointer; margin-top: 2px; transition: background 0.2s;
+  }
+  .consent-checkbox:checked { background: var(--gold); }
+  .consent-checkbox:checked::after {
+    content: ''; position: absolute; left: 5px; top: 1px;
+    width: 5px; height: 10px; border: solid var(--bg-base);
+    border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .consent-text {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px; font-weight: 300; line-height: 1.4;
+    color: rgba(250, 246, 237, 0.7); letter-spacing: 0.3px;
+  }
+  .consent-text a {
+    color: var(--gold); text-decoration: none;
+    border-bottom: 1px solid rgba(207, 181, 152, 0.4);
+  }
+  .primary-btn {
+    display: block; width: 100%; margin-top: 24px;
+    background: linear-gradient(180deg, var(--gold-light), var(--gold) 50%, var(--gold-deep));
+    border: 1px solid var(--gold-deep); color: var(--bg-base);
+    padding: 16px 24px; font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase; cursor: pointer; position: relative;
+    transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+  .primary-btn:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); }
+  .primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  /* ========= Ruleta ========= */
+  .headline { text-align: center; margin: 4px 0 8px; }
+  .headline h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600; font-size: 30px;
+    letter-spacing: 4px; color: var(--ivory);
+    text-transform: uppercase; line-height: 1.05;
+  }
+  .headline h1 em {
+    font-style: italic; font-weight: 500; color: var(--gold);
+    display: block; margin-top: 2px; letter-spacing: 6px;
+  }
+  .user-badge {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 300;
+    font-size: 14px; color: var(--gold);
+    letter-spacing: 1px; opacity: 0.85; margin-top: 6px;
+  }
+  .wheel-stage {
+    position: relative; width: 100%; max-width: 440px; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wheel-stage::before {
+    content: ''; position: absolute; inset: -20px;
+    background: radial-gradient(circle, rgba(207, 181, 152, 0.22) 0%, transparent 65%);
+    border-radius: 50%; filter: blur(12px); animation: halo 4s ease-in-out infinite;
+  }
+  @keyframes halo {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+  .wheel-frame {
+    position: relative; width: 100%; height: 100%; border-radius: 50%; padding: 10px;
+    background: conic-gradient(from 0deg, var(--gold-deep), var(--gold-light), var(--gold), var(--gold-light), var(--gold-deep), var(--gold), var(--gold-light), var(--gold-deep));
+    box-shadow:
+      0 0 0 2px var(--black), 0 0 0 3px var(--gold),
+      0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+  .wheel-inner-ring {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: var(--black); padding: 4px; position: relative;
+  }
+  .wheel {
+    width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden;
+    transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+  }
+  .wheel svg { width: 100%; height: 100%; display: block; }
+  .pointer {
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 52px; z-index: 10;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  }
+  .pointer svg { width: 100%; height: 100%; }
+  .wheel-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 100px; height: 100px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--gold-light) 0%, var(--gold) 40%, var(--gold-deep) 100%);
+    border: 3px solid var(--black);
+    box-shadow:
+      0 0 0 2px var(--gold), 0 4px 16px rgba(0, 0, 0, 0.6),
+      inset 0 2px 4px rgba(255, 255, 255, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 5;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700; font-size: 16px;
+    letter-spacing: 3px; color: var(--bg-base); text-transform: uppercase;
+    transition: transform 0.2s ease; user-select: none;
+  }
+  .wheel-center:active { transform: translate(-50%, -50%) scale(0.95); }
+  .wheel-center:disabled, .wheel-center.spinning { cursor: not-allowed; opacity: 0.75; }
+  .wheel-center .spin-label { text-align: center; line-height: 1.1; }
+  .wheel-center .spin-label small {
+    display: block; font-size: 9px; letter-spacing: 2px; opacity: 0.7; margin-top: 2px;
+    font-family: 'Oswald', sans-serif; font-weight: 500;
+  }
+  .info {
+    text-align: center; font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 300;
+    font-size: 14px; color: rgba(250, 246, 237, 0.55);
+    letter-spacing: 2px; margin-top: 8px;
+  }
+  /* ========= Modal ========= */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(26, 26, 26, 0.88);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: radial-gradient(ellipse at top, #2a2a2a 0%, var(--bg-base) 70%);
+    border: 1px solid var(--gold); border-radius: 4px; padding: 36px 28px 32px;
+    max-width: 360px; width: 100%; text-align: center; position: relative;
+    transform: translateY(30px) scale(0.9);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  }
+  .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+  .modal::before {
+    content: ''; position: absolute; inset: 6px;
+    border: 1px solid rgba(207, 181, 152, 0.4); pointer-events: none;
+  }
+  .modal-eyebrow {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 500;
+    font-size: 14px; letter-spacing: 4px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  /* Título principal del modal: en menores es "20% DE DESCUENTO", en oro es "PREMIO ORO" */
+  .modal-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700; font-size: 28px;
+    letter-spacing: 2px; color: var(--ivory);
+    line-height: 1.1; margin-bottom: 8px; text-transform: uppercase;
+  }
+  .modal-title.gold-prize {
+    color: var(--gold-light); font-size: 32px;
+    text-shadow: 0 0 20px rgba(207, 181, 152, 0.6);
+  }
+  /* Subtitle: ahora contiene el nombre completo del producto (en menores) o "Masterclass por Jorge Lentino" (oro) */
+  .modal-subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 400;
+    font-size: 16px; color: var(--ivory);
+    margin-bottom: 18px; opacity: 0.9; letter-spacing: 1px;
+    line-height: 1.3;
+  }
+  .modal-divider {
+    width: 60px; height: 1px; background: var(--gold); margin: 0 auto 18px;
+  }
+  .modal-desc {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 300; font-size: 14px; line-height: 1.5;
+    color: var(--ivory); margin-bottom: 22px; letter-spacing: 0.5px;
+  }
+  .modal-desc.compact { font-size: 13px; line-height: 1.45; }
+  .email-confirmation {
+    background: rgba(207, 181, 152, 0.08);
+    border: 1px solid rgba(207, 181, 152, 0.3);
+    padding: 14px 12px; margin-bottom: 18px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px; font-weight: 300; line-height: 1.5;
+    color: var(--ivory); letter-spacing: 0.3px;
+  }
+  .email-confirmation strong {
+    display: block; color: var(--gold);
+    font-family: 'Oswald', sans-serif;
+    font-style: italic; font-weight: 500;
+    font-size: 15px; letter-spacing: 1px;
+    margin-top: 4px; word-break: break-all;
+  }
+  .email-confirmation .envelope { font-size: 22px; margin-bottom: 6px; }
+  /* Caja del código de canjeo: ahora con label arriba y código debajo */
+  .redeem-box {
+    margin-top: 4px;
+  }
+  .redeem-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 3px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 8px;
+    opacity: 0.85;
+  }
+  .redeem-code {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 4px; color: var(--gold);
+    padding: 10px 14px; border: 1px dashed var(--gold);
+    display: inline-block;
+  }
+  .sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .sparkle {
+    position: absolute; width: 6px; height: 6px;
+    background: var(--gold-light); border-radius: 50%;
+    box-shadow: 0 0 8px var(--gold); animation: sparkle-fall 2s ease-out forwards;
+  }
+  @keyframes sparkle-fall {
+    0% { transform: translateY(-20px) scale(0); opacity: 1; }
+    50% { opacity: 1; }
+    100% { transform: translateY(400px) scale(1); opacity: 0; }
+  }
+  @media (max-height: 700px) {
+    .brand-logo { max-width: 240px; }
+    .landing-hero h1 { font-size: 32px; }
+    .headline h1 { font-size: 24px; }
+    .wheel-stage { max-width: 340px; }
+    body { padding: 16px 16px 24px; }
+    .form-card { padding: 20px 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="brand">
+      <img class="brand-logo" src="data:image/png;base64,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" alt="Max Factor">
+      <div class="brand-tagline">El Maquillaje de los Maquilladores</div>
+    </header>
+
+    <!-- SCREEN 1: EMAIL -->
+    <section class="screen active" id="screenEmail">
+      <div class="landing-hero">
+        <h1>Luces, Cámara<em>Tú</em></h1>
+        <p>Participa en nuestra ruleta exclusiva<br>y llévate un regalo Max Factor</p>
+      </div>
+      <div class="form-card">
+        <label class="form-label" for="emailInput">Introduce tu correo</label>
+        <input type="email" id="emailInput" class="form-input" placeholder="tu@correo.com"
+          autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="form-error" id="emailError">Introduce un correo válido para continuar</div>
+        <label class="consent-row">
+          <input type="checkbox" class="consent-checkbox" id="consentCheck">
+          <span class="consent-text">
+            Acepto recibir comunicaciones de Max Factor y la <a href="#" onclick="event.preventDefault()">Política de Privacidad</a>. Puedo darme de baja en cualquier momento.
+          </span>
+        </label>
+        <button class="primary-btn" id="continueBtn">Participar</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: WHEEL -->
+    <section class="screen" id="screenWheel">
+      <div class="headline">
+        <h1>Luces, Cámara<em>Tú</em></h1>
+        <div class="user-badge" id="userBadge"></div>
+      </div>
+      <div class="wheel-stage">
+        <div class="pointer" aria-hidden="true">
+          <svg viewBox="0 0 40 52" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pg" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#E5D4BE"/>
+                <stop offset="50%" stop-color="#CFB598"/>
+                <stop offset="100%" stop-color="#A89376"/>
+              </linearGradient>
+            </defs>
+            <path d="M20 52 L4 18 Q4 4 20 4 Q36 4 36 18 Z" fill="url(#pg)" stroke="#1A1A1A" stroke-width="2"/>
+            <circle cx="20" cy="16" r="4" fill="#1A1A1A"/>
+            <circle cx="20" cy="16" r="2" fill="#E5D4BE"/>
+          </svg>
+        </div>
+        <div class="wheel-frame">
+          <div class="wheel-inner-ring">
+            <div class="wheel" id="wheel">
+              <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="goldSeg" cx="50%" cy="50%" r="60%">
+                    <stop offset="0%" stop-color="#F5D88A"/>
+                    <stop offset="50%" stop-color="#E5B547"/>
+                    <stop offset="100%" stop-color="#A8821F"/>
+                  </radialGradient>
+                </defs>
+                <g id="segments"></g>
+                <circle cx="200" cy="200" r="198" fill="none" stroke="#CFB598" stroke-width="1" opacity="0.4"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <button class="wheel-center" id="spinBtn" aria-label="Girar la ruleta">
+          <span class="spin-label">GIRAR<small>· TAP ·</small></span>
+        </button>
+      </div>
+      <div class="info">Solo tienes una tirada · Haz que cuente</div>
+    </section>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="sparkles" id="sparkles"></div>
+      <div class="modal-eyebrow" id="modalEyebrow">¡Has ganado!</div>
+      <h2 class="modal-title" id="modalTitle">Premio</h2>
+      <p class="modal-subtitle" id="modalSubtitle">—</p>
+      <div class="modal-divider"></div>
+      <p class="modal-desc" id="modalDesc">—</p>
+      <div class="email-confirmation">
+        <div class="envelope">✉</div>
+        <span id="emailConfText">Hemos enviado los detalles de tu premio a:</span>
+        <strong id="confirmEmail"></strong>
+      </div>
+      <div class="redeem-box" id="redeemBox">
+        <div class="redeem-label">Código de Canjeo</div>
+        <div class="redeem-code" id="redeemCode">MXF-XXXX-XXXX</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== CONFIGURACIÓN =====
+  // Versión pública (QR): 20% de probabilidad de ganar el premio gordo.
+  const GOLD_PROBABILITY = 0.20;
+
+  // ===== PREMIOS =====
+  // 'wheelLabel' es lo que se muestra dentro del quesito (con \n para 2 líneas)
+  // 'fullName' es el nombre completo del producto (mostrado en el modal como subtitle)
+  // 'desc' es la descripción técnica del producto
+  // El TÍTULO del modal en menores es siempre "20% de descuento"; en oro es "PREMIO ORO"
+  const prizes = [
+    { wheelLabel: 'Base líquida\nMiracle',          fullName: 'Base líquida Miracle Pure Skin Reset 2-in-1 Serum Foundation', desc: 'Base con efecto serum 2-en-1 que renueva e hidrata la piel.', color: 'var(--pal-grey)',  textColor: '#FAF6ED', type: 'minor' },
+    { wheelLabel: 'Corrector\nMiracle',             fullName: 'Corrector Miracle Pure Eye Enhancer',                          desc: 'Corrector iluminador que difumina ojeras e imperfecciones.',  color: 'var(--pal-cream)', textColor: '#1A1A1A', type: 'minor' },
+    { wheelLabel: 'Polvos\nMiracle',                fullName: 'Polvos Miracle Veil',                                          desc: 'Polvos translúcidos que sellan el maquillaje con acabado natural.', color: 'var(--pal-grey)',  textColor: '#FAF6ED', type: 'minor' },
+    { wheelLabel: 'PREMIO\nORO',                      fullName: 'Masterclass por Jorge Lentino',                                desc: 'Disfruta de una masterclass de maquillaje de diario para ti y un acompañante. Cóctel, photocall y tu propio kit de maquillaje de regalo.', color: 'url(#goldSeg)', textColor: '#1A1A1A', type: 'gold' },
+    { wheelLabel: 'Bronceador\nFacefinity',         fullName: 'Bronceador Facefinity Bronzer',                                desc: 'Bronceador en polvo para un acabado luminoso y radiante.',    color: 'var(--pal-cream)', textColor: '#1A1A1A', type: 'minor' },
+    { wheelLabel: 'Rubor líquido\nMiracle',         fullName: 'Rubor líquido Miracle Pure Blush',                             desc: 'Colorete líquido de larga duración con acabado natural.',     color: 'var(--pal-grey)',  textColor: '#FAF6ED', type: 'minor' },
+    { wheelLabel: 'Lápiz de cejas\nBrow Shaper',    fullName: 'Lápiz de cejas Brow Shaper',                                   desc: 'Lápiz para definir y dar forma a las cejas con precisión.',   color: 'var(--pal-cream)', textColor: '#1A1A1A', type: 'minor' },
+    { wheelLabel: 'Máscara pestañas\nFalse Lash',   fullName: 'Máscara de pestañas False Lash Effect Mascara',                desc: 'Pestañas de impacto con efecto postizas al instante.',        color: 'var(--pal-grey)',  textColor: '#FAF6ED', type: 'minor' },
+    { wheelLabel: 'Labial\nLipfinity',              fullName: 'Labial Lipfinity Liquid Lipstick',                             desc: 'Labial líquido de larga duración con color intenso 24h.',     color: 'var(--pal-cream)', textColor: '#1A1A1A', type: 'minor' },
+  ];
+  const goldIndex = prizes.findIndex(p => p.type === 'gold');
+  const N = prizes.length;
+  const anglePer = 360 / N;
+
+  // ===== RENDER RULETA =====
+  const segmentsGroup = document.getElementById('segments');
+  const CX = 200, CY = 200, R = 196;
+  prizes.forEach((p, i) => {
+    const startAngle = i * anglePer - 90 - anglePer / 2;
+    const endAngle   = startAngle + anglePer;
+    const sRad = (startAngle * Math.PI) / 180;
+    const eRad = (endAngle   * Math.PI) / 180;
+    const x1 = CX + R * Math.cos(sRad), y1 = CY + R * Math.sin(sRad);
+    const x2 = CX + R * Math.cos(eRad), y2 = CY + R * Math.sin(eRad);
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', `M ${CX} ${CY} L ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2} Z`);
+    path.setAttribute('fill', p.color);
+    path.setAttribute('stroke', '#1A1A1A');
+    path.setAttribute('stroke-width', '1.5');
+    segmentsGroup.appendChild(path);
+
+    const textAngle = i * anglePer - 90;
+    const tRad = (textAngle * Math.PI) / 180;
+    if (p.type === 'gold') {
+      const goldLines = p.wheelLabel.split('\n');
+      const tr = 142;
+      const tx = CX + tr * Math.cos(tRad), ty = CY + tr * Math.sin(tRad);
+      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('fill', p.textColor);
+      text.setAttribute('font-family','Oswald, sans-serif');
+      text.setAttribute('font-weight','700');
+      text.setAttribute('font-size','18');
+      text.setAttribute('letter-spacing','2.5');
+      text.setAttribute('transform', `rotate(${textAngle + 90}, ${tx}, ${ty})`);
+      goldLines.forEach((line, lineIdx) => {
+        const tspan = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+        tspan.setAttribute('x', tx);
+        tspan.setAttribute('y', ty + (lineIdx - (goldLines.length - 1) / 2) * 19);
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+      segmentsGroup.appendChild(text);
+    } else {
+      const lines = p.wheelLabel.split('\n');
+      const tr = 138;
+      const tx = CX + tr * Math.cos(tRad), ty = CY + tr * Math.sin(tRad);
+      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('fill', p.textColor);
+      text.setAttribute('font-family','Oswald, sans-serif');
+      text.setAttribute('font-weight','500');
+      text.setAttribute('font-size','10.5');
+      text.setAttribute('letter-spacing','0.6');
+      text.setAttribute('transform', `rotate(${textAngle + 90}, ${tx}, ${ty})`);
+      lines.forEach((line, lineIdx) => {
+        const tspan = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+        tspan.setAttribute('x', tx);
+        tspan.setAttribute('y', ty + (lineIdx - (lines.length - 1) / 2) * 12);
+        tspan.setAttribute('font-weight', lineIdx === 0 ? '600' : '400');
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+      segmentsGroup.appendChild(text);
+    }
+  });
+
+  // ===== AUDIO =====
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function playTick() {
+    const ctx = ensureAudio();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.09);
+  }
+  function playWinFanfare(isGold) {
+    const ctx = ensureAudio();
+    const notes = isGold
+      ? [523.25, 659.25, 783.99, 1046.50, 1318.51]
+      : [392.00, 493.88, 587.33, 783.99];
+    const now = ctx.currentTime;
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.12);
+      gain.gain.setValueAtTime(0, now + i * 0.12);
+      gain.gain.linearRampToValueAtTime(0.22, now + i * 0.12 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + i * 0.12); osc.stop(now + i * 0.12 + 0.55);
+    });
+    if (isGold) {
+      for (let i = 0; i < 3; i++) {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.type = 'triangle';
+        const t = now + 0.6 + i * 0.08;
+        osc.frequency.setValueAtTime(1568 + i * 200, t);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.12, t + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.35);
+      }
+    }
+  }
+  function playWhoosh() {
+    const ctx = ensureAudio();
+    const bufferSize = ctx.sampleRate * 0.4;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize) * 0.4;
+    }
+    const noise = ctx.createBufferSource(); noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(400, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.35);
+    filter.Q.value = 1.5;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    noise.connect(filter).connect(gain).connect(ctx.destination);
+    noise.start(); noise.stop(ctx.currentTime + 0.4);
+  }
+
+  // ===== ESTADO =====
+  const state = { userEmail: '', currentRotation: 0, spinning: false };
+
+  // ===== SCREEN 1 =====
+  const screenEmail = document.getElementById('screenEmail');
+  const screenWheel = document.getElementById('screenWheel');
+  const emailInput = document.getElementById('emailInput');
+  const emailError = document.getElementById('emailError');
+  const consentCheck = document.getElementById('consentCheck');
+  const continueBtn = document.getElementById('continueBtn');
+  const userBadge = document.getElementById('userBadge');
+
+  function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+  continueBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    if (!isValidEmail(email)) {
+      emailInput.classList.add('error');
+      emailError.classList.add('active');
+      emailError.textContent = 'Introduce un correo válido para continuar';
+      return;
+    }
+    if (!consentCheck.checked) {
+      emailError.classList.add('active');
+      emailError.textContent = 'Debes aceptar las condiciones para participar';
+      return;
+    }
+    state.userEmail = email;
+    userBadge.textContent = email;
+    ensureAudio();
+    screenEmail.classList.remove('active');
+    setTimeout(() => screenWheel.classList.add('active'), 50);
+  });
+  emailInput.addEventListener('input', () => {
+    emailInput.classList.remove('error');
+    emailError.classList.remove('active');
+  });
+  emailInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') continueBtn.click();
+  });
+
+  // ===== SCREEN 2 =====
+  const wheel = document.getElementById('wheel');
+  const spinBtn = document.getElementById('spinBtn');
+  const modal = document.getElementById('modal');
+  const modalEyebrow = document.getElementById('modalEyebrow');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalSubtitle = document.getElementById('modalSubtitle');
+  const modalDesc = document.getElementById('modalDesc');
+  const confirmEmail = document.getElementById('confirmEmail');
+  const redeemCode = document.getElementById('redeemCode');
+  const redeemBox = document.getElementById('redeemBox');
+  const sparklesBox = document.getElementById('sparkles');
+
+  function generateRedeemCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'MXF-';
+    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    code += '-';
+    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+  }
+
+  // ===== SELECCIÓN =====
+  function pickPrizeIndex() {
+    if (Math.random() < GOLD_PROBABILITY) return goldIndex;
+    const minorIdx = prizes.map((p, i) => p.type !== 'gold' ? i : -1).filter(i => i >= 0);
+    return minorIdx[Math.floor(Math.random() * minorIdx.length)];
+  }
+
+  // ===== GIRO =====
+  function spin() {
+    if (state.spinning) return;
+    state.spinning = true;
+    spinBtn.classList.add('spinning');
+    spinBtn.disabled = true;
+    ensureAudio();
+    playWhoosh();
+
+    const chosenIndex = pickPrizeIndex();
+    const targetAngle = -(chosenIndex * anglePer);
+    const jitter = (Math.random() - 0.5) * (anglePer * 0.75);
+    const spins = 6 + Math.floor(Math.random() * 2);
+    const currentMod = state.currentRotation % 360;
+    const finalRotation = state.currentRotation + spins * 360 + (targetAngle - currentMod) + jitter;
+    wheel.style.transform = `rotate(${finalRotation}deg)`;
+    state.currentRotation = finalRotation;
+
+    const duration = 5000;
+    const startTime = performance.now();
+    let tickTimeout = null;
+    function scheduleTick() {
+      const elapsed = performance.now() - startTime;
+      if (elapsed >= duration) return;
+      const progress = elapsed / duration;
+      const interval = 60 + Math.pow(progress, 2) * 400;
+      playTick();
+      tickTimeout = setTimeout(scheduleTick, interval);
+    }
+    scheduleTick();
+
+    setTimeout(() => {
+      if (tickTimeout) clearTimeout(tickTimeout);
+      const prize = prizes[chosenIndex];
+      showResult(prize);
+      state.spinning = false;
+      spinBtn.classList.remove('spinning');
+      spinBtn.disabled = false;
+    }, duration + 50);
+  }
+
+  // ===== RESULTADO =====
+  function showResult(prize) {
+    const isGold = prize.type === 'gold';
+    confirmEmail.textContent = state.userEmail;
+
+    if (isGold) {
+      // ORO: título "PREMIO ORO", subtitle "Masterclass por Jorge Lentino", desc, sin código
+      modalEyebrow.textContent = '¡Has ganado!';
+      modalTitle.textContent = 'PREMIO ORO';
+      modalTitle.classList.add('gold-prize');
+      modalSubtitle.textContent = prize.fullName;
+      modalDesc.textContent = prize.desc;
+      modalDesc.classList.add('compact');
+      redeemBox.style.display = 'none';
+      createSparkles(40);
+      playWinFanfare(true);
+    } else {
+      // MENOR: título "20% DE DESCUENTO", subtitle = nombre completo, desc producto, código de canjeo
+      modalEyebrow.textContent = '¡Has ganado!';
+      modalTitle.textContent = '20% de descuento';
+      modalTitle.classList.remove('gold-prize');
+      modalSubtitle.textContent = prize.fullName;
+      modalDesc.textContent = prize.desc;
+      modalDesc.classList.remove('compact');
+      redeemBox.style.display = 'block';
+      redeemCode.textContent = generateRedeemCode();
+      createSparkles(15);
+      playWinFanfare(false);
+    }
+    setTimeout(() => modal.classList.add('active'), 200);
+  }
+
+  function createSparkles(count) {
+    sparklesBox.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = (-10 - Math.random() * 30) + 'px';
+      s.style.animationDelay = (Math.random() * 0.8) + 's';
+      s.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+      s.style.width = s.style.height = (4 + Math.random() * 6) + 'px';
+      sparklesBox.appendChild(s);
+    }
+    setTimeout(() => sparklesBox.innerHTML = '', 3000);
+  }
+
+  spinBtn.addEventListener('click', spin);
+  // Cerrar modal tocando fuera (ya no hay botón)
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.remove('active');
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.scale !== 1) e.preventDefault();
+  }, { passive: false });
+</script>
+</body>
+</html>
